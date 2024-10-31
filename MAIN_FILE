@@ -1,0 +1,178 @@
+import csv
+import tkinter as tkin
+from tkinter import ttk
+
+
+main = tkin.Tk()
+width= main.winfo_screenwidth() 
+height= main.winfo_screenheight()
+main.geometry("%dx%d" % (width, height))
+mainTree = ttk.Treeview(main,height=33)
+mainTree.column("#0",width=600)
+mainTree.tag_configure("bold", font=("TkDefaultFont", 10, "bold"))
+mainTree.heading("#0",text="Codes")
+mainTree.place(x=0,y=0)
+
+iterator = 0
+terminate = False
+goodResults = 0
+
+def recurFuncCode(theArray,parent,parentOb,depth,length,target,hidden):
+    global iterator, terminate, goodResults
+    
+    while theArray[iterator][0] != target[0]:
+        iterator += 1
+        
+        if iterator >= len(theArray):
+            return False
+        
+    
+    thisOb = None
+    interest = False
+    while iterator < len(theArray):
+                
+        if hidden == True:
+            mainTree.item(parentOb,open=False)
+        #if terminate == True:
+            #return True
+        
+        #Including the code above makes it so that any entries after the target is found are omitted
+         
+        
+        if len(str(theArray[iterator])) > length:
+                
+                
+                curr = theArray[iterator -1]
+                myStufff = recurFuncCode(theArray,theArray[iterator-1],thisOb,depth+1,len(theArray[iterator]),target,True)
+                if myStufff == True:
+                    mainTree.item(thisOb,open=True)
+                    interest = True
+                elif parentOb == "null" and myStufff == False:
+                    if curr != target:
+                        mainTree.delete(thisOb)
+        elif len(str(theArray[iterator])) < length:
+            if interest == True:
+                return True
+            else:
+                return False
+        else:
+            if (str(theArray[iterator]) == target and parentOb != "null"):
+                    interest = True
+                    thisOb = mainTree.insert(parentOb,tkin.END,text=theArray[iterator] + " - " + descrip[iterator],tags=("bold"))
+                    goodResults += 1
+            elif parentOb != "null":
+                thisOb = mainTree.insert(parentOb,tkin.END,text=theArray[iterator] + " - " + descrip[iterator])
+            else:
+                if (str(theArray[iterator]) == target) :
+                    interest = True
+                    thisOb = mainTree.insert("",tkin.END,text=theArray[iterator] + " - " + descrip[iterator],tags=("bold"))
+                    goodResults += 1
+                else:
+                    thisOb = mainTree.insert("",tkin.END,text=theArray[iterator] + " - " + descrip[iterator])
+                    mainTree.item(thisOb,open=True)
+            if parentOb == "null" and len(theArray[iterator+1]) == length and (target not in theArray[iterator]):
+                mainTree.delete(thisOb)
+
+            iterator += 1
+            
+            
+
+
+def recurFuncKey(theArray,parent,parentOb,depth,length,target,hidden):
+    global iterator, terminate, goodResults
+    
+    
+    thisOb = None
+    interest = False
+    while iterator < len(theArray):
+                
+        if hidden == True:
+            mainTree.item(parentOb,open=False)
+        #if terminate == True:
+            #return True
+        
+        #Including the code above makes it so that any entries after the target is found are omitted
+
+        
+        if len(str(theArray[iterator])) > length:
+                
+                
+                curr = descrip[iterator-1]
+                myStufff = recurFuncKey(theArray,theArray[iterator-1],thisOb,depth+1,len(theArray[iterator]),target,True)
+                if myStufff == True:
+                    mainTree.item(thisOb,open=True)
+                    interest = True
+                elif parentOb == "null" and myStufff == False:
+                    if target.lower() not in curr.lower():
+                        mainTree.delete(thisOb)
+        elif len(str(theArray[iterator])) < length:
+            if interest == True:
+                return True
+            else:
+                return False
+        else:
+            if target.lower() in str(descrip[iterator]).lower() and parentOb != "null":
+                    interest = True
+                    thisOb = mainTree.insert(parentOb,tkin.END,text=theArray[iterator] + " - " + descrip[iterator],tags=("bold"))
+                    goodResults += 1
+            elif parentOb != "null":
+                thisOb = mainTree.insert(parentOb,tkin.END,text=theArray[iterator] + " - " + descrip[iterator])
+            else:
+                if target.lower() in str(descrip[iterator]).lower() :
+                    interest = True
+                    thisOb = mainTree.insert("",tkin.END,text=theArray[iterator] + " - " + descrip[iterator],tags=("bold"))
+                    goodResults += 1
+                else:
+                    thisOb = mainTree.insert("",tkin.END,text=theArray[iterator] + " - " + descrip[iterator])
+                    mainTree.item(thisOb,open=True)
+            if parentOb == "null" and len(theArray[iterator+1]) == length and (target.lower() not in descrip[iterator].lower()):
+                mainTree.delete(thisOb)
+
+            iterator += 1
+    
+    if target.lower() not in descrip[iterator-1].lower() and thisOb != None:
+        mainTree.delete(thisOb)
+            
+            
+
+theArray = []
+descrip = []
+with open("myCodes.txt", 'r') as myRead:
+    for line in myRead:
+        theArray.append(line.split()[1])
+        descrip.append(' '.join(line.split()[3::]))
+
+valid = False
+while valid == False:
+    valid = True
+    theType = input("Search by code or keyword ENTER: (code/keyword)")
+    if theType.lower() == "code":
+        while goodResults == 0:
+            iterator = 0
+            goodResults = 0
+            code = input("Enter your code!")
+            recurFuncCode(theArray,"No Parent","null",0,3,code,False)
+            
+            if goodResults == 0:
+                print("0 results found! enter again")
+            else:
+                print(goodResults, "results found!")
+    elif theType.lower() == "keyword":
+        while goodResults == 0:
+            iterator = 0
+            goodResults = 0
+            keyword = input("Enter your keyword!")
+            recurFuncKey(theArray,"No Parent", "null",0,3,keyword,False)
+            
+            if goodResults == 0:
+                print("0 results found! Enter again")
+            else:
+                print(goodResults, "results found!")
+    else:
+        print("INVALID INPUT!")
+        valid = False
+
+
+
+main.mainloop()
+
