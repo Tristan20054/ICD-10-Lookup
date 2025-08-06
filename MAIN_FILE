@@ -137,7 +137,7 @@ def recurFuncKey(theArray,parent,parentOb,depth,length,target,hidden):
 
 theArray = []
 descrip = []
-with open("mytext.txt", 'r') as myRead:
+with open("Downloads/mytext.txt", 'r') as myRead:
     for line in myRead:
         theArray.append(line.split()[1])
         descrip.append(' '.join(line.split()[3::]))
