@@ -1,6 +1,9 @@
 # ICD-10-Lookup
 Searches for ICD-10 Codes with keyword and code functionality. (MUST USE PROVIDED FILE FOR DATA)
 
+Technologies:
+
+This is pretty light weight, only utilizing the python tkinter gui library as well as a large CSV (Comma separated Values) file.
 
 
 
